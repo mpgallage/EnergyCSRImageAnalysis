@@ -1,7 +1,6 @@
 install.packages("pdftools")
 install.packages("png")
 
-library(httr)
 library(stringi)
 library(pdftools)
 library(png)
