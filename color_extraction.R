@@ -124,3 +124,43 @@ ggplot(colors, aes(Year, group = 1)) +
   xlab("Publication Year") + ylab("Color intensity (%)")
 
 ggsave("rgb_by_year.png", dpi = 300)
+
+
+red_average_class <- dataframe %>% 
+  group_by(`Publication Year`, Class) %>%
+  summarise(R = mean(R)*100/256)
+
+green_average_class <- dataframe %>% 
+  group_by(`Publication Year`, Class) %>%
+  summarise(G = mean(G)*100/256)
+
+blue_average_class <- dataframe %>% 
+  group_by(`Publication Year`, Class) %>%
+  summarise(B = mean(B)*100/256)
+
+colors <- data.frame(Year = red_average_class$`Publication Year`,
+                     Class = red_average_class$Class,
+                     R = red_average_class$R, 
+                     G = green_average_class$G, 
+                     B = blue_average_class$B)
+ggplot(colors, aes(Year, group = 1)) +
+  geom_point(aes(y = R, color = "red")) + geom_line(aes(y = R, color = "red")) +
+  geom_point(aes(y = G, color = "green")) + geom_line(aes(y = G, color = "green")) +
+  geom_point(aes(y = B, color = "blue")) + geom_line(aes(y = B, color = "blue")) +
+  ggthemes::theme_clean() + 
+  theme(axis.title.x = element_text(size=12, face="bold", color = "black", 
+                                    margin=margin(10,0,10,0)),
+        axis.title.y = element_text(size=12, face="bold", color = "black",
+                                    margin=margin(0,10,0,10)),
+        axis.text.x = element_text(angle = 45, hjust = 1)) +
+  scale_color_manual(name = "Color Channel",
+                     labels = c("Red",
+                                "Green",
+                                "Blue"),
+                     values = c("red",
+                                "green",
+                                "blue")) +
+  xlab("Publication Year") + ylab("Color intensity (%)") +
+  facet_wrap(~Class)
+
+ggsave("rgb_by_year_group_class.png", dpi = 300)
