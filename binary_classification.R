@@ -75,8 +75,10 @@ dataframe <- cbind(dataframe, Human = prediction[, 2])
 
 saveRDS(dataframe, "data_after_binary_classification.rds")
 
+dataframe <- readRDS("data_after_binary_classification.rds")
 
 library(ggplot2)
+library(dplyr)
 
 dataframe <- dataframe %>% filter(`Publication Year` %in% (2007:2017))
 
@@ -93,9 +95,15 @@ total_reports <- dataframe %>%
 avg_human_figures <- data.frame(year = total_reports$`Publication Year`, 
                                 avg_human = (human_figures$n/total_reports$n))
 
-ggplot(avg_human_figures, aes(year, avg_human, color = "red", group = 1)) + 
-  geom_point() + geom_line() + theme(legend.position="none") +
-  xlab("Publication Year") + ylab("Average human face appearance")
+ggplot(avg_human_figures, aes(year, avg_human, group = 1)) + 
+  geom_line(color = "green") + geom_point(color = "springgreen4") + 
+  ggthemes::theme_clean() + theme(legend.position="none") + 
+  xlab("Publication Year") + ylab("Average human face appearance") +
+  theme(axis.title.x = element_text(size=12, face="bold", color = "black", 
+                                    margin=margin(10,0,10,0)),
+        axis.title.y = element_text(size=12, face="bold", color = "black", 
+                                    margin=margin(0,10,0,10)))
+ggsave("avg_human_figures_by_year.png", dpi = 300)
 
 
 # Human figure average by region ####
@@ -112,11 +120,29 @@ avg_human_figures <- data.frame(year = total_reports$`Publication Year`,
                                 region = total_reports$Region,
                                 avg_human = (human_figures$n/total_reports$n))
 
-ggplot(avg_human_figures, aes(year, avg_human, color = region, group = 1)) + 
-  geom_line() + geom_point() + facet_wrap(~ region) +
-  theme(legend.position="none") + xlab("Publication Year") + 
+ggplot(avg_human_figures, aes(year, avg_human, color = region, group = region)) + 
+  geom_line() + geom_point() + ggthemes::theme_clean() +
+  theme(axis.title.x = element_text(size=12, face="bold", color = "black", 
+                                    margin=margin(10,0,10,0)),
+        axis.title.y = element_text(size=12, face="bold", color = "black",
+                                    margin=margin(0,10,0,10))) +
+  scale_color_manual(name = "Region",
+                     labels = c("Africa", 
+                                "Asia", 
+                                "Europe", 
+                                "Latin America", 
+                                "North America", 
+                                "Oceania"),
+                     values = c("red",
+                                "green",
+                                "springgreen4",
+                                "royalblue4",
+                                "olivedrab4",
+                                "pink")) +
+  xlab("Publication Year") + 
   ylab("Average human face appearance")
 
+ggsave("avg_human_figures_by_year_group_region.png", dpi = 300)
 
 # Human figure average by company size ####
 human_figures <- dataframe %>%
@@ -132,7 +158,19 @@ avg_human_figures <- data.frame(year = total_reports$`Publication Year`,
                                 size = total_reports$Size,
                                 avg_human = (human_figures$n/total_reports$n))
 
-ggplot(avg_human_figures, aes(year, avg_human, color = size, group = 1)) + 
-  geom_line() + geom_point() + facet_wrap(~ size) +
-  theme(legend.position="none") + xlab("Publication Year") + 
-  ylab("Average human face appearance")
+ggplot(avg_human_figures, aes(year, avg_human, color = size, group = size)) + 
+  geom_line() + geom_point() + ggthemes::theme_clean() +
+  theme(axis.title.x = element_text(size=12, face="bold", color = "black", 
+                                    margin=margin(10,0,10,0)),
+        axis.title.y = element_text(size=12, face="bold", color = "black",
+                                    margin=margin(0,10,0,10))) +
+  scale_color_manual(name = "Company Size",
+                     labels = c("Large", 
+                                "MNE", 
+                                "SME"),
+                     values = c("green",
+                                "springgreen4",
+                                "olivedrab4")) +
+  xlab("Publication Year") + ylab("Average human face appearance")
+
+ggsave("avg_human_figures_by_year_group_size.png", dpi = 300)

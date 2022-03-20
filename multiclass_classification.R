@@ -91,6 +91,9 @@ saveRDS(dataframe, "data_after_multiclass_classification.rds")
 
 
 library(ggplot2)
+library(dplyr)
+
+dataframe <- readRDS("data_after_multiclass_classification.rds")
 
 dataframe <- dataframe %>% filter(`Publication Year` %in% (2007:2017))
 
@@ -105,8 +108,21 @@ total_reports <- dataframe %>%
 
 avg_year_to_class <- merge(year_to_class, total_reports, by = "Publication Year", all.x = TRUE)
 
-ggplot(avg_year_to_class, aes(`Publication Year`, n.x/n.y, color = Class, group = 1)) + 
-  geom_line() + geom_point() + facet_wrap(~ Class) +
-  theme(legend.position="none") + xlab("Publication Year") + 
-  ylab("Average probability of class")
+ggplot(avg_year_to_class, aes(`Publication Year`, n.x/n.y, color = Class, group = Class)) + 
+  geom_line() + geom_point() + ggthemes::theme_clean() +
+  theme(axis.title.x = element_text(size=12, face="bold", color = "black", 
+                                    margin=margin(10,0,10,0)),
+        axis.title.y = element_text(size=12, face="bold", color = "black",
+                                    margin=margin(0,10,0,10))) +
+  scale_color_manual(name = "Image Class",
+                     labels = c("Miscellaneous",
+                                "Nature",
+                                "People", 
+                                "Technology"),
+                     values = c("royalblue4",
+                                "green3",
+                                "olivedrab4",
+                                "springgreen4")) +
+  xlab("Publication Year") + ylab("Average probability of class")
 
+ggsave("avg_prob_image_class.png", dpi = 300)
